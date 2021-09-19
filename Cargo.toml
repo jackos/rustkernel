@@ -1,0 +1,16 @@
+[package]
+name = "rustkernel"
+version = "0.0.1"
+authors = ["Jack Clayton"]
+description = "A kernel for running Rust code interactively in a browser or VS Code"
+license = "MIT"
+readme = "README.md"
+repository = "https://github.com/rustnote/rustkernel"
+documentation = "https://rustnote.com"
+homepage = "https://rustnote.com"
+edition = "2018"
+
+
+# See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
+
+[dependencies]
