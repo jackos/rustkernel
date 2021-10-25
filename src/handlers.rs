@@ -3,6 +3,7 @@ use serde::{Deserialize, Serialize};
 use std::borrow::Cow;
 use std::io::prelude::*;
 use std::net::TcpStream;
+use substring::Substring;
 use String;
 
 use crate::program::Program;
@@ -50,7 +51,7 @@ pub fn handle_connection(mut stream: TcpStream, program: &mut Program) {
         None => program.create_cell(&cr),
     }
 
-    program.write_to_file();
+    program.write_to_file(cr.fragment);
 
     use std::process::Command;
     let output = Command::new("cargo")
@@ -63,16 +64,30 @@ pub fn handle_connection(mut stream: TcpStream, program: &mut Program) {
     let mut out = String::from_utf8(output.stdout).expect("Failed to parse utf8");
     let err = String::from_utf8(output.stderr).expect("Failed to parse utf8");
     if err.contains("error: ") || err.contains("panicked at") {
-        println!("Error: {}", err);
         response_code = "HTTP/1.1 422 Unprocessable Entity";
         out = err;
     }
 
+    let re_start = Regex::new(r"rustkernel-start").expect("Couldn't compile start regex");
+    let re_end = Regex::new(r"rustkernel-end").expect("Couldn't compile end regex");
+
+    let start = re_start
+        .find(&out)
+        .expect("Couldn't find start of output")
+        .end();
+    let end = re_end
+        .find(&out)
+        .expect("Couldn't find end of output")
+        .start();
+
+    let result = out.substring(start, end);
+    println!("body: {}", &result);
+
     let response = format!(
         "{}\r\nContent-Length: {}\r\n\r\n{}",
         response_code,
-        out.len(),
-        out
+        result.len(),
+        result
     );
 
     stream.write(response.as_bytes()).unwrap();

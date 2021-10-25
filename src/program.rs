@@ -58,20 +58,22 @@ impl Program {
         }
     }
 
-    pub fn write_to_file(&mut self) {
+    pub fn write_to_file(&mut self, fragment: u32) {
         // Sort based on current index's in VS Code
-        let mut cells_vec: Vec<(u32, &String)> = self
-            .cells
-            .iter()
-            .map(|(_, cell)| (cell.index, &cell.contents))
-            .collect();
-        cells_vec.sort_by(|a, b| a.0.cmp(&b.0));
+        let mut cells_vec: Vec<&Cell> = self.cells.iter().map(|(_, cell)| (cell)).collect();
+        cells_vec.sort_by(|a, b| a.index.cmp(&b.index));
 
         // Write the file output
         let mut output = "fn main() {\n".to_string();
-        for (_, contents) in cells_vec {
+        for cell in cells_vec {
+            if cell.fragment == fragment {
+                output += "\nprintln!(\"rustkernel-start\");"
+            }
             output += "\n";
-            output += contents;
+            output += &cell.contents;
+            if cell.fragment == fragment {
+                output += "\nprintln!(\"rustkernel-end\");"
+            }
         }
         output += "\n\n}";
 
