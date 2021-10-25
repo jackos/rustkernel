@@ -118,13 +118,19 @@ impl Program {
             .expect("Failed to run cargo");
 
         let mut response_code = "HTTP/1.1 200 OK";
-        let mut out = String::from_utf8(output.stdout).expect("Failed to parse utf8");
         let err = String::from_utf8(output.stderr).expect("Failed to parse utf8");
+
         if err.contains("error: ") || err.contains("panicked at") {
             response_code = "HTTP/1.1 422 Unprocessable Entity";
-            out = err;
+            return format!(
+                "{}\r\nContent-Length: {}\r\n\r\n{}",
+                response_code,
+                err.len(),
+                err
+            );
         }
 
+        let out = String::from_utf8(output.stdout).expect("Failed to parse utf8");
         let re_start = Regex::new(r"rustkernel-start").expect("Couldn't compile start regex");
         let re_end = Regex::new(r"rustkernel-end").expect("Couldn't compile end regex");
 

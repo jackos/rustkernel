@@ -1,6 +1,6 @@
 [package]
 name = "rustkernel"
-version = "0.0.6"
+version = "0.0.7"
 authors = ["Jack Clayton"]
 description = "Kernel for running Rust code interactively in VS Code, will later be extended to other platforms"
 license = "MIT"
