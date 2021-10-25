@@ -59,26 +59,20 @@ pub fn handle_connection(mut stream: TcpStream, program: &mut Program) {
         .output()
         .expect("Failed to run cargo");
 
-    let hello = String::from_utf8(output.stdout).expect("Failed to parse utf8");
-    println!("{}", hello);
-
-    // Well formed request to root is all we'll
-    let post = b"POST / HTTP/1.1";
-
-    let (status_line, filename) = if buffer.starts_with(post) {
-        ("HTTP/1.1 200 OK", hello)
-    } else {
-        (
-            "HTTP/1.1 404 NOT FOUND",
-            "The only route that exists is /".to_string(),
-        )
-    };
+    let mut response_code = "HTTP/1.1 200 OK";
+    let mut out = String::from_utf8(output.stdout).expect("Failed to parse utf8");
+    let err = String::from_utf8(output.stderr).expect("Failed to parse utf8");
+    if err.contains("error: ") || err.contains("panicked at") {
+        println!("Error: {}", err);
+        response_code = "HTTP/1.1 422 Unprocessable Entity";
+        out = err;
+    }
 
     let response = format!(
         "{}\r\nContent-Length: {}\r\n\r\n{}",
-        status_line,
-        filename.len(),
-        filename
+        response_code,
+        out.len(),
+        out
     );
 
     stream.write(response.as_bytes()).unwrap();
