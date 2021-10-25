@@ -1,6 +1,6 @@
 [package]
 name = "rustkernel"
-version = "0.0.5"
+version = "0.0.6"
 authors = ["Jack Clayton"]
 description = "Kernel for running Rust code interactively in VS Code, will later be extended to other platforms"
 license = "MIT"
@@ -21,3 +21,7 @@ substring = "1.4.5"
 
 [net]
 git-getch-with-cli = true
+
+[[bin]]
+name = "rustkernel"
+path = "src/main.rs"
