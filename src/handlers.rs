@@ -9,8 +9,8 @@ use crate::program::Program;
 
 #[derive(Serialize, Deserialize, Debug)]
 pub struct CodeRequest {
-    pub index: i32,
-    pub fragment: i32,
+    pub index: u32,
+    pub fragment: u32,
     pub filename: String,
     pub contents: String,
 }
@@ -50,13 +50,28 @@ pub fn handle_connection(mut stream: TcpStream, program: &mut Program) {
         None => program.create_cell(&cr),
     }
 
+    program.write_to_file();
+
+    use std::process::Command;
+    let output = Command::new("cargo")
+        .current_dir(&program.temp_file)
+        .arg("run")
+        .output()
+        .expect("Failed to run cargo");
+
+    let hello = String::from_utf8(output.stdout).expect("Failed to parse utf8");
+    println!("{}", hello);
+
     // Well formed request to root is all we'll
     let post = b"POST / HTTP/1.1";
 
     let (status_line, filename) = if buffer.starts_with(post) {
-        ("HTTP/1.1 200 OK", "Hello")
+        ("HTTP/1.1 200 OK", hello)
     } else {
-        ("HTTP/1.1 404 NOT FOUND", "The only route that exists is /")
+        (
+            "HTTP/1.1 404 NOT FOUND",
+            "The only route that exists is /".to_string(),
+        )
     };
 
     let response = format!(
