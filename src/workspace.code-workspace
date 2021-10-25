@@ -1,0 +1,11 @@
+{
+  "folders": [
+	{
+		"path": ".."
+	},
+	{
+		"path": "../../../../go/src/github.com/gobook/gokernel"
+	}
+],
+  "settings": {}
+}
