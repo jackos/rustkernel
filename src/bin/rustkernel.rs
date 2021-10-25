@@ -1,6 +1,4 @@
-use rustkernel::handlers::handle_connection;
-use rustkernel::program::Program;
-use rustkernel::thread_pool::ThreadPool;
+use rustkernel::{handlers, program::Program};
 use std::net::TcpListener;
 
 fn main() {
@@ -9,19 +7,14 @@ fn main() {
     let listener = TcpListener::bind(host).expect("Could not start listener");
     println!("Listening at {}...", host);
 
-    let pool = match ThreadPool::new(1) {
-        Err(e) => panic!("Error creating pool: {}", e),
-        Ok(pool) => pool,
-    };
+    // This program will remain in state while the server is running
+    let mut program = Program::new();
 
     for stream in listener.incoming() {
+        // Create a program if it doesn't yet exist
         let stream = stream.expect("Could not iterate over stream");
 
-        let x = pool.execute(|| {
-            handle_connection(stream);
-        });
-
-        pool.workers[0].program = Some(x);
+        handlers::handle_connection(stream, &mut program);
     }
 
     println!("Shutting down.");

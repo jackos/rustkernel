@@ -37,15 +37,18 @@ fn extract_body(req: Cow<str>) -> String {
     body[0..content_len].to_string()
 }
 
-pub fn handle_connection(mut stream: TcpStream) -> Program {
+pub fn handle_connection(mut stream: TcpStream, program: &mut Program) {
     let mut buffer = [0; 1024];
     stream.read(&mut buffer).expect("Error reading stream");
     let req = String::from_utf8_lossy(&buffer);
     let body = extract_body(req);
 
-    let mut cr: CodeRequest = serde_json::from_str(&body).expect("Error parsing JSON");
+    let cr: CodeRequest = serde_json::from_str(&body).expect("Error parsing JSON");
 
-    let x = crate::program::Program::new(&mut cr);
+    match program.cells.get(&cr.fragment) {
+        Some(_) => program.update_cell(&cr),
+        None => program.create_cell(&cr),
+    }
 
     // Well formed request to root is all we'll
     let post = b"POST / HTTP/1.1";
@@ -65,5 +68,4 @@ pub fn handle_connection(mut stream: TcpStream) -> Program {
 
     stream.write(response.as_bytes()).unwrap();
     stream.flush().unwrap();
-    x
 }
