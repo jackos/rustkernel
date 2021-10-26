@@ -5,7 +5,7 @@ use String;
 
 use crate::Program;
 
-/// Format the request from VS Code comes through in
+/// The requests from VS Code are marshalled through `Serde` via this struct
 ///
 /// # Terms
 /// - index: the current vertical position of the cell that was executed
@@ -20,10 +20,10 @@ pub struct CodeRequest {
     pub contents: String,
 }
 
-/// All requests run through here, it
+/// All requests run through here
 /// # Parameters
-/// stream: Contains the http request, it's read from which modifies
-/// it's internal state, which is why it needs to `mut`. Also contains
+/// stream: Contains the http request, when it's read from it modifies
+/// internal state, which is why it needs to be `mut`. Also contains
 /// a reference to the `Program` which lives for the lifetime of the
 /// server running. It retains information between requests
 pub fn code_request(mut stream: TcpStream, program: &mut Program) {

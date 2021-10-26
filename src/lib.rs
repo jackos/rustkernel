@@ -30,7 +30,7 @@ use regex::Regex;
 /// ```
 pub fn extract_body(req: &str) -> String {
     let double_newline =
-        Regex::new(r"(?:\r\r|\n\n|\r\n\r\n)(.*)$").expect("Couldn't compile double newline regex");
+        Regex::new(r"(?:\r\r|\n\n|\r\n\r\n)(.*})").expect("Couldn't compile double newline regex");
     let b = double_newline.captures(&req).expect("Error capturing body");
     String::from(
         b.get(1)
