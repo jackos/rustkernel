@@ -1,15 +1,16 @@
+// Makes `Cell` and `Program` available from root e.g. `use rustkernel::Program`
 pub use self::program::{Cell, Program};
 
+// Links the code from `handlers.rs` and `program.rs`
 pub mod handlers;
 pub mod program;
 
 use regex::Regex;
-use std::borrow::Cow;
 
 /// Extracts body of request using a regex capture group and parsing the content length
 /// It then splits the request in two and takes the second block following the http 1.1
 /// spec of the body separating it by two CRLF's
-pub fn extract_body(req: Cow<str>) -> String {
+pub fn extract_body(req: &str) -> String {
     let re = Regex::new(r"Content-Length: (\d.*)").unwrap();
     let capture = re.captures(&req).expect("Error with regex");
     // Get the body content length

@@ -11,27 +11,36 @@ use std::fs::write;
 /// been executed by checking `cells` which is a `HashMap`
 /// # Terms
 /// - temp_dir: Whatever the OS temp directory is
-/// TODO: Implement filename check and extracting functions
 /// - executed_filename: Last executed filename so we can restart state if necessary
 /// - functions: will rip out anything inside a fn() and put it in the outer scope
 /// - cells: VS Code name for a notebook cell
 #[derive(Debug)]
 pub struct Program {
-    pub temp_dir: String,          // Temp file location
-    pub executed_filename: String, // The most recently executed filename
-    pub functions: String,         // The code that is pulled out of the main function
-    pub cells: HashMap<u32, Cell>, // Represents a cell from VS Code notebook
+    pub temp_dir: String,
+    pub executed_filename: String,
+    pub functions: String,
+    pub cells: HashMap<u32, Cell>,
 }
 
+/// A cell represent a notebook cell in VS Code
+///
+/// # Terms
+/// - fragment: unique id of the cell that executed
+/// - index: current index by order in VS Code
+/// - contents: the source code from inside the cell
+/// - executing: if true this cell is where the request came from,
+/// used to determine what output to return to caller
 #[derive(Debug)]
 pub struct Cell {
-    pub fragment: u32,    // What index the cell was at, at time of execution
-    pub index: u32,       // Current index by order in VS Code
-    pub contents: String, // What's inside the cell
-    pub executing: bool,  // The cell that is currently being executed
+    pub fragment: u32,
+    pub index: u32,
+    pub contents: String,
+    pub executing: bool,
 }
 
 impl Program {
+    /// Create a new program which is retained in state
+    /// between `http` requests
     pub fn new() -> Program {
         let mut temp_file = env::temp_dir()
             .to_str()
