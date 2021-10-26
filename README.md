@@ -10,14 +10,14 @@ It's currently being used just for the [VS Code extension - Rustnote](https://ma
 This is still in the experimental stages, there are many features to be added.
 
 ## Links
-[API Docs](https://docs.rs/rustkernel/0.0.7/rustkernel/)
-[Crate](https://crates.io/crates/rustkernel)
-[Github](https://github.com/rustnote/rustkernel)
-[Source Code](https://docs.rs/crate/rustkernel/0.0.7/source/)
+- [API Docs](https://docs.rs/rustkernel/0.0.7/rustkernel/)
+- [Crate](https://crates.io/crates/rustkernel)
+- [Github](https://github.com/rustnote/rustkernel)
+- [Source Code](https://docs.rs/crate/rustkernel/0.0.7/source/)
 
 ## Quick Start
 
-Start a server on port `8787` and await requests:
+To start a server on port `8787` and await requests:
 ```bash
 cargo install rustkernel 
 rustkernel
@@ -28,16 +28,16 @@ Request should be a `POST` request to root: `/`, the body should match the [docu
 The only header required at this stage is `Content-Length: [len of body]`
 
 ## Currently working
-[x] - Take in Rust code, run it and return `stdout` / `stderr`
-[x] - Work with VS Code Notebook features e.g. cell order may change
+- [x] - Take in Rust code, run it and return `stdout` / `stderr`
+- [x] - Work with VS Code Notebook features e.g. cell order may change
 
 ## In development
-[ ] - If the file that notebook is being run from changes, reset state
-[ ] - Extract functions from code and put them outside the `fn main` body
-[ ] - Move `use`,  `structs` and `enums` outside the `fn main` body 
-[ ] - Add `use` required crates to `cargo.toml`
-[ ] - Pre-cache most popular crates, run this as an opt in background process
-[ ] - Environment variable to set the port
-[ ] - Move to web framework for security features
-[ ] - Use traits to allow for use from VS Code or from browser
-[ ] - On request where last item is an expression, return debug/format output in nicely formatted html that can be rendered in VS Code or a browser.
+- [ ] If the file that notebook is being run from changes, reset state
+- [ ] Extract functions from code and put them outside the `fn main` body
+- [ ] Move `use`,  `structs` and `enums` outside the `fn main` body 
+- [ ] Add `use` required crates to `cargo.toml`
+- [ ] Pre-cache most popular crates, run this as an opt in background process
+- [ ] Environment variable to set the port
+- [ ] Move to web framework for security features
+- [ ] Use traits to allow for use from VS Code or from browser
+- [ ] On request where last item is an expression, return debug/format output in nicely formatted html that can be rendered in VS Code or a browser.

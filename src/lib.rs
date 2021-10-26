@@ -7,24 +7,72 @@ pub mod program;
 
 use regex::Regex;
 
-/// Extracts body of request using a regex capture group and parsing the content length
-/// It then splits the request in two and takes the second block following the http 1.1
-/// spec of the body separating it by two CRLF's
+/// Extracts body of request using a regex capture group and parsing the content length.
+/// Splits the request in two and takes the second block following the http 1.1 standard
+/// of a separation by two newlines
+///
+/// # Examples
+/// ```
+/// use rustkernel::extract_body;
+/// let req = r"POST / HTTP/1.1
+/// Content-Type: text/plain;charset=UTF-8
+/// Accept: */*
+/// Content-Length: 16
+/// User-Agent: node-fetch/1.0 (+https://github.com/bitinn/node-fetch)
+/// Accept-Encoding: gzip,deflate
+/// Connection: close
+/// Host: 127.0.0.1:8787
+///
+/// body-placeholder";
+/// let res = extract_body(req);
+/// println!("{}", res);
+/// assert_eq!(res, "body-placeholder");
+/// ```
 pub fn extract_body(req: &str) -> String {
-    let re = Regex::new(r"Content-Length: (\d.*)").unwrap();
-    let capture = re.captures(&req).expect("Error with regex");
-    // Get the body content length
-    let content_len: usize = capture
-        .get(1)
-        .expect("Regex failed to match Content-Length")
-        .as_str()
-        .trim()
-        .parse()
-        .expect("Failed to parse content length");
+    let double_newline =
+        Regex::new(r"(?:\r\r|\n\n|\r\n\r\n)(.*)$").expect("Couldn't compile double newline regex");
+    let b = double_newline.captures(&req).expect("Error capturing body");
+    String::from(
+        b.get(1)
+            .expect("Regex failed to match double newline")
+            .as_str()
+            .trim(),
+    )
+}
 
-    // Use an iterator to get the second block
-    let mut para = req.split("\r\n\r\n");
-    para.next();
-    let body = String::from(para.next().expect("Error getting body from request"));
-    body[0..content_len].to_string()
+#[cfg(test)]
+mod tests {
+    use crate::extract_body;
+
+    #[test]
+    fn returning_body_from_request() {
+        let req = "POST / HTTP/1.1
+Content-Type: text/plain;charset=UTF-8
+Accept: */*
+Content-Length: 16
+User-Agent: node-fetch/1.0 (+https://github.com/bitinn/node-fetch)
+Accept-Encoding: gzip,deflate
+Connection: close
+Host: 127.0.0.1:8787
+
+{\"test\":\"cool\"};";
+        let res = extract_body(req);
+        println!("{}", res);
+        assert_eq!(&res, "{\"test\":\"cool\"};");
+    }
+
+    #[test]
+    #[should_panic]
+    fn test_panics_on_malformed_request() {
+        let req = r"POST / HTTP/1.1
+Content-Type: text/plain;charset=UTF-8
+Accept: */*
+Content-Length: 120
+User-Agent: node-fetch/1.0 (+https://github.com/bitinn/node-fetch)
+Accept-Encoding: gzip,deflate
+Connection: close
+Host: 127.0.0.1:8787
+body-placeholder";
+        extract_body(req);
+    }
 }

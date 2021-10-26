@@ -1,3 +1,6 @@
+//! This module is responsible for keeping the program in state
+//! between API calls. The `Program` struct holds the cells in a
+//! hashmap
 use regex::Regex;
 use substring::Substring;
 
@@ -9,11 +12,13 @@ use std::fs::write;
 /// This is what sits in state as long as the program is running
 /// when a new request is made, it will check if the same cell has
 /// been executed by checking `cells` which is a `HashMap`
+///
 /// # Terms
 /// - temp_dir: Whatever the OS temp directory is
 /// - executed_filename: Last executed filename so we can restart state if necessary
 /// - functions: will rip out anything inside a fn() and put it in the outer scope
 /// - cells: VS Code name for a notebook cell
+
 #[derive(Debug)]
 pub struct Program {
     pub temp_dir: String,
