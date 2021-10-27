@@ -97,7 +97,8 @@ impl Program {
                     outer_scope += "\n";
                     let (_, full_path) = line.split_once(' ').unwrap();
                     let (crate_name, _) = full_path.split_once(':').unwrap();
-                    crates += crate_name;
+                    let crate_name_fixed = str::replace(crate_name, "_", "-");
+                    crates += &crate_name_fixed;
                     crates += "=\"*\"\n";
                 } else {
                     output += line;
@@ -105,7 +106,7 @@ impl Program {
                 }
             }
         }
-        output += "\n\n}";
+        output += "\n}";
         let mut main = outer_scope.clone();
         main += &output;
 
