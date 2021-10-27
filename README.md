@@ -1,5 +1,6 @@
 
 
+
 # Rustkernel
 ## Introduction
 
@@ -18,10 +19,12 @@ This is still in the experimental stages, there are many features to be added.
 ## Quick Start
 
 To start a server on port `8787` and await requests:
-```bash
+
+```plaintext
 cargo install rustkernel 
 rustkernel
 ```
+
 
 ## Request format
 Request should be a `POST` request to root: `/`, the body should match the [documentation structure here](https://docs.rs/rustkernel/0.0.7/rustkernel/handlers/struct.CodeRequest.html)

@@ -14,19 +14,19 @@ use regex::Regex;
 /// # Examples
 /// ```
 /// use rustkernel::extract_body;
-/// let req = r"POST / HTTP/1.1
-/// Content-Type: text/plain;charset=UTF-8
-/// Accept: */*
-/// Content-Length: 16
-/// User-Agent: node-fetch/1.0 (+https://github.com/bitinn/node-fetch)
-/// Accept-Encoding: gzip,deflate
-/// Connection: close
-/// Host: 127.0.0.1:8787
+/// let req = r#"
+///    POST / HTTP/1.1
+///    Content-Type: text/plain;charset=UTF-8
+///    Accept: */*
+///    Content-Length: 16
+///    User-Agent: node-fetch/1.0 (+https://github.com/bitinn/node-fetch)
+///    Accept-Encoding: gzip,deflate
+///    Connection: close
+///    Host: 127.0.0.1:8787
 ///
-/// body-placeholder";
+///    {"test":"cool"}"#;
 /// let res = extract_body(req);
-/// println!("{}", res);
-/// assert_eq!(res, "body-placeholder");
+/// assert_eq!(&res, r#"{"test":"cool"}"#);
 /// ```
 pub fn extract_body(req: &str) -> String {
     let double_newline =
@@ -46,33 +46,34 @@ mod tests {
 
     #[test]
     fn returning_body_from_request() {
-        let req = "POST / HTTP/1.1
-Content-Type: text/plain;charset=UTF-8
-Accept: */*
-Content-Length: 16
-User-Agent: node-fetch/1.0 (+https://github.com/bitinn/node-fetch)
-Accept-Encoding: gzip,deflate
-Connection: close
-Host: 127.0.0.1:8787
+        let req = r#"
+            POST / HTTP/1.1
+            Content-Type: text/plain;charset=UTF-8
+            Accept: */*
+            Content-Length: 16
+            User-Agent: node-fetch/1.0 (+https://github.com/bitinn/node-fetch)
+            Accept-Encoding: gzip,deflate
+            Connection: close
+            Host: 127.0.0.1:8787
 
-{\"test\":\"cool\"};";
+            {"test":"cool"}"#;
         let res = extract_body(req);
         println!("{}", res);
-        assert_eq!(&res, "{\"test\":\"cool\"};");
+        assert_eq!(&res, r#"{"test":"cool"}"#);
     }
 
     #[test]
     #[should_panic]
     fn test_panics_on_malformed_request() {
         let req = r"POST / HTTP/1.1
-Content-Type: text/plain;charset=UTF-8
-Accept: */*
-Content-Length: 120
-User-Agent: node-fetch/1.0 (+https://github.com/bitinn/node-fetch)
-Accept-Encoding: gzip,deflate
-Connection: close
-Host: 127.0.0.1:8787
-body-placeholder";
+            Content-Type: text/plain;charset=UTF-8
+            Accept: */*
+            Content-Length: 120
+            User-Agent: node-fetch/1.0 (+https://github.com/bitinn/node-fetch)
+            Accept-Encoding: gzip,deflate
+            Connection: close
+            Host: 127.0.0.1:8787
+            body-placeholder";
         extract_body(req);
     }
 }
