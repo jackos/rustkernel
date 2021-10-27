@@ -6,7 +6,7 @@ fn main() {
     // Start the server
     let host: &str = "127.0.0.1:8787";
     let listener = TcpListener::bind(host).expect("Could not start listener");
-    println!("Listening at {}...", host);
+    println!("Rustkernel is running on {}", host);
 
     // The Program will remain in state while the server is running
     let mut program = Program::new();

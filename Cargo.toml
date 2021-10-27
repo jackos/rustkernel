@@ -2,18 +2,13 @@
 name = "rustkernel"
 version = "0.0.11"
 authors = ["Jack Clayton"]
-description = "Kernel for running Rust code interactively in VS Code, will later be extended to other platforms"
+description = "Kernel for running Rust code interactively in VS Code Notebook"
 license = "MIT"
 readme = "README.md"
 repository = "https://github.com/rustnote/rustkernel"
 documentation = "https://docs.rs/rustkernel/"
 homepage = "https://rustnote.com"
 edition = "2021"
-
-[dependencies]
-
-[net]
-git-getch-with-cli = true
 
 [[bin]]
 name = "rustkernel"

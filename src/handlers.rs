@@ -40,6 +40,13 @@ pub fn code_request(mut stream: TcpStream, program: &mut Program) {
         contents: req_iter.next().unwrap().to_string(),
     };
 
+    // If the filename is different to last run, this resets
+    // the state of `Program`
+    if cr.filename != program.filename {
+        *program = Program::new();
+    }
+    program.filename = cr.filename.clone();
+
     // If there is a cell already there, update existing, otherwise create
     match program.cells.get(&cr.fragment) {
         Some(_) => program.update_cell(&cr),
