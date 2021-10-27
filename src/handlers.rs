@@ -1,4 +1,3 @@
-use serde::{Deserialize, Serialize};
 use std::io::prelude::*;
 use std::net::TcpStream;
 use String;
@@ -12,7 +11,6 @@ use crate::Program;
 /// - fragment: a unique ID for each cell, if they change order this id remains the same
 /// - filename: Where the file was executed from, important to reset the code if the user changes files
 /// - contents: the contents / source code of a cell
-#[derive(Serialize, Deserialize, Debug)]
 pub struct CodeRequest {
     pub index: u32,
     pub fragment: u32,
@@ -31,16 +29,16 @@ pub fn code_request(mut stream: TcpStream, program: &mut Program) {
     let mut buffer = [0; 8192];
     stream.read(&mut buffer).expect("Error reading stream");
 
-    // Convert the utf8 to a string, lossy means unknown characters
-    // are replaced with `?`
-    // `Cow` is `copy on write` but not using it as a mutable
+    // Convert the utf8 to a string
     let req = String::from_utf8_lossy(&buffer);
+    let mut req_iter = req.split("\0");
 
-    // Uses the library function to extract the body from a HTTP 1.1 request
-    let body = crate::extract_body(&req);
-
-    // Marshalls the json
-    let cr: CodeRequest = serde_json::from_str(&body).expect("Error parsing JSON");
+    let cr = CodeRequest {
+        index: req_iter.next().unwrap().parse().unwrap(),
+        fragment: req_iter.next().unwrap().parse().unwrap(),
+        filename: req_iter.next().unwrap().to_string(),
+        contents: req_iter.next().unwrap().to_string(),
+    };
 
     // If there is a cell already there, update existing, otherwise create
     match program.cells.get(&cr.fragment) {

@@ -1,9 +1,6 @@
 //! This module is responsible for keeping the program in state
 //! between API calls. The `Program` struct holds the cells in a
 //! hashmap
-use regex::Regex;
-use substring::Substring;
-
 use crate::handlers::CodeRequest;
 use std::collections::HashMap;
 use std::env;
@@ -98,12 +95,12 @@ impl Program {
         let mut output = "fn main() {\n".to_string();
         for cell in cells_vec {
             if cell.fragment == fragment {
-                output += "\nprintln!(\"rustkernel-start\");"
+                output += "\nprintln!(\"\0\");";
             }
             output += "\n";
             output += &cell.contents;
             if cell.fragment == fragment {
-                output += "\nprintln!(\"rustkernel-end\");"
+                output += "\nprintln!(\"\0\");";
             }
         }
         output += "\n\n}";
@@ -131,40 +128,18 @@ impl Program {
             .output()
             .expect("Failed to run cargo");
 
-        let mut response_code = "HTTP/1.1 200 OK";
         let err = String::from_utf8(output.stderr).expect("Failed to parse utf8");
 
         if err.contains("error: ") || err.contains("panicked at") {
-            response_code = "HTTP/1.1 422 Unprocessable Entity";
-            return format!(
-                "{}\r\nContent-Length: {}\r\n\r\n{}",
-                response_code,
-                err.len(),
-                err
-            );
+            // 1 denotes an error
+            return format!("1\0{}", err);
         }
 
-        let out = String::from_utf8(output.stdout).expect("Failed to parse utf8");
-        let re_start = Regex::new(r"rustkernel-start").expect("Couldn't compile start regex");
-        let re_end = Regex::new(r"rustkernel-end").expect("Couldn't compile end regex");
-
-        let start = re_start
-            .find(&out)
-            .expect("Couldn't find start of output")
-            .end();
-        let end = re_end
-            .find(&out)
-            .expect("Couldn't find end of output")
-            .start();
-
-        let result = out.substring(start, end);
-        println!("body: {}", &result);
-
-        format!(
-            "{}\r\nContent-Length: {}\r\n\r\n{}",
-            response_code,
-            result.len(),
-            result
-        )
+        let output = String::from_utf8(output.stdout).unwrap();
+        let mut x = output.split('\0');
+        x.next();
+        let res = x.next().unwrap();
+        x.next();
+        format!("0\0{}", res)
     }
 }
