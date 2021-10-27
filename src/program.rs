@@ -46,8 +46,6 @@ impl Program {
             .to_string();
         temp_file = temp_file;
 
-        println!("Ctrl+Click to view rust file: {}/main.rs", temp_file);
-        println!("Ctrl+Click to view cargo file: {}/Cargo.toml", temp_file);
         Program {
             temp_dir: temp_file,
             filename: String::new(),
@@ -94,7 +92,7 @@ impl Program {
                 let line = line.trim();
                 // Don't print if it's not the executing cell
                 if line.starts_with("print") && cell.fragment != fragment {
-                } else if line.starts_with("use") {
+                } else if !line.starts_with("use std") && line.starts_with("use") {
                     outer_scope += line;
                     outer_scope += "\n";
                     let (_, full_path) = line.split_once(' ').unwrap();
