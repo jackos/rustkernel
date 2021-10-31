@@ -35,7 +35,6 @@ VS Code and Rust communicate over TCP with utf8, it doesn't follow http protocol
 - [x] - Take in Rust code, run it and return `stdout` / `stderr`
 - [x] - Work with VS Code Notebook features e.g. cell order may change
 - [x] If the file that notebook is being run from changes, reset state
-- [ ] Extract functions from code and put them outside the `fn main` body
 - [x] Move `use` outside the `fn main` body 
 - [x] Add `use` required crates to `cargo.toml`
 - [ ] Pre-cache most popular crates, run this as an opt in background process

@@ -83,13 +83,18 @@ impl Program {
         cells_vec.sort_by(|a, b| a.index.cmp(&b.index));
 
         // Write the file output
-        let mut output = "#![allow(dead_code)]\nfn main() {\n".to_string();
         let mut crates = String::new();
         let mut outer_scope = String::new();
+        let mut inner_scope = String::new();
+        let mut contains_main = false;
         for cell in cells_vec {
             let lines = cell.contents.split('\n');
             for line in lines {
                 let line = line.trim();
+                // If it contains main we won't add a main function
+                if line.starts_with("fn main()") {
+                    contains_main = true;
+                }
                 // Don't print if it's not the executing cell
                 if line.starts_with("print") && cell.fragment != fragment {
                 } else if !line.starts_with("use std") && line.starts_with("use") {
@@ -101,12 +106,21 @@ impl Program {
                     crates += &crate_name_fixed;
                     crates += "=\"*\"\n";
                 } else {
-                    output += line;
-                    output += "\n";
+                    inner_scope += line;
+                    inner_scope += "\n";
                 }
             }
         }
-        output += "\n}";
+        let mut output = "#![allow(dead_code)]\n".to_string();
+
+        if contains_main {
+            output += &inner_scope;
+        } else {
+            output += "fn main() {\n";
+            output += &inner_scope;
+            output += "}";
+        }
+
         let mut main = outer_scope.clone();
         main += &output;
 

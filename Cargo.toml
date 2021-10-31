@@ -1,6 +1,6 @@
 [package]
 name = "rustkernel"
-version = "0.0.15"
+version = "0.0.16"
 authors = ["Jack Clayton"]
 description = "Kernel for running Rust code interactively in VS Code Notebook"
 license = "MIT"
@@ -13,3 +13,5 @@ edition = "2021"
 [[bin]]
 name = "rustkernel"
 path = "src/main.rs"
+
+[features]
