@@ -3,7 +3,7 @@
 //! hashmap
 use crate::handlers::CodeRequest;
 use std::collections::HashMap;
-use std::env;
+use std::fs;
 use std::fs::write;
 
 /// This is what sits in state as long as the program is running
@@ -17,8 +17,8 @@ use std::fs::write;
 
 #[derive(Debug)]
 pub struct Program {
-    pub temp_dir: String,
     pub filename: String,
+    pub workspace: String,
     pub cells: HashMap<u32, Cell>,
 }
 
@@ -40,15 +40,9 @@ impl Program {
     /// Create a new program which is retained in state
     /// between `http` requests
     pub fn new() -> Program {
-        let mut temp_file = env::temp_dir()
-            .to_str()
-            .expect("Error getting temp directory")
-            .to_string();
-        temp_file = temp_file;
-
         Program {
-            temp_dir: temp_file,
             filename: String::new(),
+            workspace: String::new(),
             cells: HashMap::new(),
         }
     }
@@ -124,11 +118,23 @@ impl Program {
         let mut main = outer_scope.clone();
         main += &output;
 
-        // Get temp file names
-        let mut rust_file = String::from(&self.temp_dir);
-        let mut cargo_file = String::from(&self.temp_dir);
-        rust_file += "/main.rs";
+        // Use the folder name sent from VS Code to create the
+        // file structure required for a cargo project
+        let mut dir = self.workspace.to_owned();
+
+        let mut cargo_file = dir.clone();
         cargo_file += "/Cargo.toml";
+
+        dir += "/src";
+        let mut main_file = dir.to_owned();
+        main_file += "/main.rs";
+
+        if let Err(err) = fs::create_dir_all(&dir) {
+            if err.kind() != std::io::ErrorKind::AlreadyExists {
+                panic!("Can't create dir: {}, err {}", &dir, err)
+            }
+        };
+
         let cargo_contents = format!(
             "{}\n{}",
             r#"
@@ -136,16 +142,13 @@ impl Program {
 name = 'output'
 version = '0.0.1'
 edition = '2021'
-[[bin]]
-name = 'ouput'
-path = 'main.rs'
 [dependencies]
 "#,
             crates
         );
 
         // Write the files
-        write(&rust_file, &main).expect("Error writing file");
+        write(&main_file, &main).expect("Error writing file");
         write(&cargo_file, &cargo_contents).expect("Error writing file");
     }
 
@@ -155,7 +158,7 @@ path = 'main.rs'
     pub fn run(&self) -> String {
         use std::process::Command;
         let output = Command::new("cargo")
-            .current_dir(&self.temp_dir)
+            .current_dir(&self.workspace)
             .arg("run")
             .output()
             .expect("Failed to run cargo");

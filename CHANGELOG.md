@@ -1,3 +1,8 @@
+## v0.0.17
+Now puts temp files inside the VS Code workspace, so Rust Analyzer can work with them
+
+## v0.0.16
+Now able to use a `main` function
 
 ## v0.0.12
 External crates now working

@@ -15,6 +15,7 @@ pub struct CodeRequest {
     pub index: u32,
     pub fragment: u32,
     pub filename: String,
+    pub workspace: String,
     pub contents: String,
 }
 
@@ -37,6 +38,7 @@ pub fn code_request(mut stream: TcpStream, program: &mut Program) {
         index: req_iter.next().unwrap().parse().unwrap(),
         fragment: req_iter.next().unwrap().parse().unwrap(),
         filename: req_iter.next().unwrap().to_string(),
+        workspace: req_iter.next().unwrap().to_string(),
         contents: req_iter.next().unwrap().to_string(),
     };
 
@@ -45,7 +47,8 @@ pub fn code_request(mut stream: TcpStream, program: &mut Program) {
     if cr.filename != program.filename {
         *program = Program::new();
     }
-    program.filename = cr.filename.clone();
+    program.filename = cr.filename.to_owned();
+    program.workspace = cr.workspace.to_owned();
 
     // If there is a cell already there, update existing, otherwise create
     match program.cells.get(&cr.fragment) {

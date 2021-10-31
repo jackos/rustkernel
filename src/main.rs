@@ -10,10 +10,6 @@ fn main() {
 
     // The Program will remain in state while the server is running
     let mut program = Program::new();
-
-    println!("Ctrl+Click to view: {}/main.rs", &program.temp_dir);
-    println!("Ctrl+Click to view: {}/Cargo.toml", &program.temp_dir);
-
     // This is the main loop over incoming streams
     for stream in listener.incoming() {
         let stream = stream.expect("Could not iterate over stream");
