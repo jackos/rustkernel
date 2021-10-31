@@ -83,7 +83,7 @@ impl Program {
         cells_vec.sort_by(|a, b| a.index.cmp(&b.index));
 
         // Write the file output
-        let mut output = "fn main() {\n".to_string();
+        let mut output = "#![allow(dead_code)]\nfn main() {\n".to_string();
         let mut crates = String::new();
         let mut outer_scope = String::new();
         for cell in cells_vec {
