@@ -5,6 +5,7 @@ use crate::handlers::CodeRequest;
 use std::collections::HashMap;
 use std::fs;
 use std::fs::write;
+use std::process::Command;
 
 /// This is what sits in state as long as the program is running
 /// when a new request is made, it will check if the same cell has
@@ -156,7 +157,6 @@ edition = '2021'
     /// then uses regex to determine what part of the output to send back
     /// to the caller
     pub fn run(&self) -> String {
-        use std::process::Command;
         let output = Command::new("cargo")
             .current_dir(&self.workspace)
             .arg("run")
@@ -172,5 +172,13 @@ edition = '2021'
 
         let output = String::from_utf8(output.stdout).unwrap();
         format!("0\0{}", output)
+    }
+
+    pub fn fmt(&self) {
+        Command::new("cargo")
+            .current_dir(&self.workspace)
+            .arg("fmt")
+            .output()
+            .expect("Failed to run cargo fmt");
     }
 }

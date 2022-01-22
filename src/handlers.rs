@@ -5,7 +5,6 @@ use String;
 use crate::Program;
 
 /// The requests from VS Code are marshalled through `Serde` via this struct
-///
 /// # Terms
 /// - index: the current vertical position of the cell that was executed
 /// - fragment: a unique ID for each cell, if they change order this id remains the same
@@ -63,4 +62,7 @@ pub fn code_request(mut stream: TcpStream, program: &mut Program) {
     let response = program.run();
     stream.write(response.as_bytes()).unwrap();
     stream.flush().unwrap();
+
+    // Format the file for anyone looking at the source code
+    program.fmt();
 }

@@ -1,3 +1,6 @@
+## v0.0.18
+Now formats the output code with `rust fmt`, added some initial information
+
 ## v0.0.17
 Now puts temp files inside the VS Code workspace, so Rust Analyzer can work with them
 
