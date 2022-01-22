@@ -4,4 +4,4 @@ version = 3
 
 [[package]]
 name = "rustkernel"
-version = "0.0.17"
+version = "0.0.18"
