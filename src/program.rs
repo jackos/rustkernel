@@ -84,10 +84,9 @@ impl Program {
         let mut contains_main = false;
         for cell in cells_vec {
             let lines = cell.contents.split('\n');
-            for (i, line) in lines.enumerate() {
+            for line in lines {
                 let line = line.trim();
                 // If it contains main we won't add a main function
-                println!("{i}: {line} {}");
                 if line.starts_with("fn main()") {
                     contains_main = true;
                     continue;
