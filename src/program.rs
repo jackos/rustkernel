@@ -84,11 +84,13 @@ impl Program {
         let mut contains_main = false;
         for cell in cells_vec {
             let lines = cell.contents.split('\n');
-            for line in lines {
+            for (i, line) in lines.enumerate() {
                 let line = line.trim();
                 // If it contains main we won't add a main function
+                println!("{i}: {line} {}");
                 if line.starts_with("fn main()") {
                     contains_main = true;
+                    continue;
                 }
                 // Don't print if it's not the executing cell
                 if line.starts_with("print") && cell.fragment != fragment {
@@ -105,19 +107,18 @@ impl Program {
                     inner_scope += "\n";
                 }
             }
+            if contains_main {
+                inner_scope = inner_scope.trim_end().to_string();
+                inner_scope.pop();
+                contains_main = false;
+            }
         }
+
         let mut output = "#![allow(dead_code)]\n".to_string();
-
-        if contains_main {
-            output += &inner_scope;
-        } else {
-            output += "fn main() {\n";
-            output += &inner_scope;
-            output += "}";
-        }
-
-        let mut main = outer_scope.clone();
-        main += &output;
+        output += outer_scope.as_str();
+        output += "fn main() {\n";
+        output += &inner_scope;
+        output += "}";
 
         // Use the folder name sent from VS Code to create the
         // file structure required for a cargo project
@@ -149,7 +150,7 @@ edition = '2021'
         );
 
         // Write the files
-        write(&main_file, &main).expect("Error writing file");
+        write(&main_file, &output).expect("Error writing file");
         write(&cargo_file, &cargo_contents).expect("Error writing file");
     }
 

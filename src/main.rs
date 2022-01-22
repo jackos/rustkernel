@@ -19,9 +19,9 @@ Change the path in File > Preferences > Settings > 'rustnote'
 --------------------------------------------------------------
 -- Default Keybindings ---------------------------------------
 --------------------------------------------------------------
-alt+f: Add rustnote path to workspace and search notes
-alt+s: Serve notes as static website using mdBook
-alt+o: Open tmp directory with Rust Analyzer
+alt+f: Search notes in VS Code, add rustnote path to workspace
+alt+p: Preview notes as static website using mdBook
+alt+o: Open main.rs to see what code is being generated
 
 Change in File > Preferences > Keyboard Shortcuts > 'rustnote'
 "

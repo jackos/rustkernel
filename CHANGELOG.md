@@ -1,3 +1,8 @@
+# Change Log
+
+## v0.0.18
+Fixed problems with having a main function, and `allow(dead_code)` in the wrong spot
+
 ## v0.0.18
 Now formats the output code with `rust fmt`, added some initial information
 
