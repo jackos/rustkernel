@@ -93,14 +93,19 @@ impl Program {
                 }
                 // Don't print if it's not the executing cell
                 if line.starts_with("print") && cell.fragment != fragment {
-                } else if !line.starts_with("use std") && line.starts_with("use") {
+                    continue;
+                }
+
+                if line.starts_with("use") {
                     outer_scope += line;
                     outer_scope += "\n";
-                    let (_, full_path) = line.split_once(' ').unwrap();
-                    let (crate_name, _) = full_path.split_once(':').unwrap();
-                    let crate_name_fixed = str::replace(crate_name, "_", "-");
-                    crates += &crate_name_fixed;
-                    crates += "=\"*\"\n";
+                    if !line.starts_with("use std") {
+                        let (_, full_path) = line.split_once(' ').unwrap();
+                        let (crate_name, _) = full_path.split_once(':').unwrap();
+                        let crate_name_fixed = str::replace(crate_name, "_", "-");
+                        crates += &crate_name_fixed;
+                        crates += "=\"*\"\n";
+                    }
                 } else {
                     inner_scope += line;
                     inner_scope += "\n";
